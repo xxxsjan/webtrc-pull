@@ -1,0 +1,12 @@
+{
+  "name": "webtrc-pull",
+  "version": "1.0.0",
+  "description": "socket.io\r vue\r express\r https\r webrtc-adapter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
