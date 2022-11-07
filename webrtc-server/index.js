@@ -84,4 +84,16 @@ io.on('connection', (socket) => {
   socket.on('candidate', async (candidate) => {
     socket.to(candidate.id).emit('candidate', candidate);
   });
+
+  // socket.on('open-live', async (data) => {
+  //   socket.join(socket.id);
+  //   socket.emit('live-msg', {
+  //     msg: socket.id + '开播成功',
+  //   });
+  // });
+
+  // socket.on('enter-live', async (data) => {
+  //   console.log(data);
+  //   socket.emit('offer', { id: socket.id });
+  // });
 });

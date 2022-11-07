@@ -1,8 +1,6 @@
 <template>
   <div>
-    <!-- <VideoMeeting /> -->
-    <!-- <VideoMeeting2 /> -->
-    <MediaRecorderPage />
+    <StartLive />
   </div>
 </template>
 
@@ -10,6 +8,7 @@
 import VideoMeeting from './views/VideoMeeting/index.vue';
 import VideoMeeting2 from './views/VideoMeeting2.vue';
 import MediaRecorderPage from './views/MediaRecorder.vue';
+import StartLive from './views/StartLive.vue';
 </script>
 <style>
 #app {
