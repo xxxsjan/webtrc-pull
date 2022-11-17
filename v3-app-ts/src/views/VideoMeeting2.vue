@@ -39,6 +39,7 @@ function sendMsg(eventName: string, data?: any, cb?: () => void) {
 }
 const allConnection = new Map();
 function getConnection(id: string, stream = localStream.value) {
+  console.log(allConnection);
   let connection = allConnection.get(id);
   if (connection) {
     return connection;
@@ -49,7 +50,7 @@ function getConnection(id: string, stream = localStream.value) {
   });
   connection.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
     if (e.candidate) {
-      // 发送 candidate --> 其他端
+      // 发送 candidate --> 其他端 id是其他端
       sendMsg('candidate', { sdp: e.candidate, id });
     }
   };
@@ -74,6 +75,7 @@ function getConnection(id: string, stream = localStream.value) {
     };
   }
   allConnection.set(id, connection);
+  console.log(allConnection);
   return connection;
 }
 async function initSocket() {
@@ -93,7 +95,8 @@ async function initSocket() {
   });
 
   socket.on('offer', async (offer: { sdp: RTCSessionDescription; id: string; originId: string }) => {
-    console.log(socketId.value, '-offer-', offer.originId, offer.id);
+    console.log('-offer-', 'originId', offer.originId, 'id', offer.id);
+    console.log(allConnection.get(offer.originId));
     const _connect = getConnection(offer.originId);
     await _connect.setRemoteDescription(offer.sdp);
     const answer = await _connect.createAnswer();
@@ -110,7 +113,7 @@ async function initSocket() {
   });
   // 接收其他端的candidate
   socket.on('candidate', async (data: { sdp: RTCIceCandidate; id: string; originId: string }) => {
-    console.log('candidate');
+    console.log('candidate', data);
     // if (socketId.value == data.originId) return;
     const _connect = getConnection(data.originId);
     await _connect.addIceCandidate(data.sdp);
@@ -118,7 +121,6 @@ async function initSocket() {
 
   socket.on('new', async (newId) => {
     if (newId == socketId.value) {
-      alert('加入大厅成功');
       console.log('加入大厅成功');
     } else {
       console.log('new user:', newId);

@@ -56,7 +56,7 @@ io.on('connection', (socket) => {
   });
   //消息中转
   socket.on('message', (message) => {
-    console.log('message', socket.id, 'target:' + message.target, 'data-type:' + message.data.type);
+    console.log('message', 'socket.id', socket.id, 'target:' + message.target, 'data-type:' + message.data.type);
     if (message.target) {
       socket.to(message.target).emit('message', {
         originId: socket.id,
@@ -71,6 +71,7 @@ io.on('connection', (socket) => {
     }
   });
 
+  // 222222222222222222222222222222222222222222
   socket.on('offer', async (offer, cb) => {
     console.log('offer', socket.id);
     socket.to(offer.id).emit('offer', offer);
@@ -82,18 +83,37 @@ io.on('connection', (socket) => {
     cb && cb();
   });
   socket.on('candidate', async (candidate) => {
+    console.log('candidate: ');
     socket.to(candidate.id).emit('candidate', candidate);
   });
 
-  // socket.on('open-live', async (data) => {
-  //   socket.join(socket.id);
-  //   socket.emit('live-msg', {
-  //     msg: socket.id + '开播成功',
-  //   });
-  // });
+  // 333333333333333333333333333333333333333333333333333333333
+  socket.on('open-live', async (data) => {
+    socket.join(data.roomId);
+    socket.emit('live-msg', {
+      msg: '开播成功',
+    });
+  });
 
-  // socket.on('enter-live', async (data) => {
-  //   console.log(data);
-  //   socket.emit('offer', { id: socket.id });
-  // });
+  socket.on('enter-live', async (data) => {
+    userList.push(socket.id);
+    socket.join(data.roomId);
+    socket.to(data.roomId).emit('new', data.id);
+  });
+  socket.on('live-offer', async (data) => {
+    console.log('live-offer: ');
+    socket.to(data.id).emit('offer', data);
+  });
+  socket.on('live-answer', async (data) => {
+    console.log('live-answer: ');
+    socket.to(data.id).emit('answer', data);
+  });
+  socket.on('live-candidate', async (data) => {
+    console.log('live-candidate', data.origin, data.id);
+    socket.to(data.id).emit('candidate', data);
+  });
+
+  socket.on('get-looker', (data) => {
+    socket.to(data.roomId).emit('get-look', { list: userList });
+  });
 });
