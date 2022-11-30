@@ -23,3 +23,9 @@ https
 webrtc-adapter
 
 参考<https://juejin.cn/post/6964571538729205773>
+
+### tensorflow使用
+
+// 动作
+pnpm add @tensorflow-models/pose-detection @tensorflow/tfjs-backend-webgl
+pnpm add @tensorflow/tfjs

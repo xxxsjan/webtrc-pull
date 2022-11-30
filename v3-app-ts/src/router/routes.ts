@@ -34,9 +34,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/CanvasToVideo.vue'),
       },
       {
-        path: '/PortraitVideo',
-        name: 'PortraitVideo',
-        component: () => import('@/views/PortraitVideo.vue'),
+        path: '/MattingVideo',
+        name: 'MattingVideo',
+        component: () => import('@/views/MattingVideo.vue'),
+      },
+      {
+        path: '/filter-video',
+        name: 'filter-video',
+        component: () => import('@/views/filter-video.vue'),
+      },
+      {
+        path: '/use-tensorflow',
+        name: 'use-tensorflow',
+        component: () => import('@/views/use-tensorflow.vue'),
       },
     ],
   },
