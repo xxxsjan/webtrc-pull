@@ -8,9 +8,13 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.1.0",
     "core-js": "^3.8.3",
+    "element-plus": "^2.2.25",
+    "lodash-es": "^4.17.21",
     "socket.io-client": "^4.5.3",
     "vue": "^3.2.13",
+    "vue-router": "^4.1.6",
     "webrtc-adapter": "^8.2.0"
   },
   "devDependencies": {
@@ -20,7 +24,9 @@
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.19",
     "tailwindcss": "^3.2.4",
-    "typescript": "~4.5.5"
+    "typescript": "~4.5.5",
+    "unplugin-auto-import": "^0.12.0",
+    "unplugin-vue-components": "^0.22.11"
   },
   "browserslist": [
     "> 1%",

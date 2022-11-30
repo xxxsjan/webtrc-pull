@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="video-meeting">
     <div style="margin-top: 20px">
       <p>我的画面 （{{ mineSocketId }}）</p>
       <video ref="localVideoRef" autoPlay playsInline id="localVideoRef"></video>
@@ -26,4 +26,13 @@ const localVideoRef = ref<any>(null);
 const { mineSocketId, userList, isJoin, emitJoin } = VideoMeeting(localVideoRef);
 </script>
 
-<style></style>
+<style>
+.video-meeting {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>

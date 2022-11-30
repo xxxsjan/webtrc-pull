@@ -41,8 +41,7 @@ const io = new Server(https, {
 const userList = [];
 io.on('connection', (socket) => {
   console.log('connection~', socket.id, JSON.stringify(socket.handshake.query));
-  // userList.push(socket.id);
-
+  console.log(socket.id, socket.rooms);
   socket.on('join', () => {
     console.log(socket.id, 'join in');
     socket.join('demo'); // 大厅聊天
@@ -89,6 +88,7 @@ io.on('connection', (socket) => {
 
   // 333333333333333333333333333333333333333333333333333333333
   socket.on('open-live', async (data) => {
+    console.log('open-live: ');
     socket.join(data.roomId);
     socket.emit('live-msg', {
       msg: '开播成功',
@@ -97,6 +97,7 @@ io.on('connection', (socket) => {
 
   socket.on('enter-live', async (data) => {
     userList.push(socket.id);
+    console.log('userList: ', userList);
     socket.join(data.roomId);
     socket.to(data.roomId).emit('new', data.id);
   });
@@ -114,6 +115,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('get-looker', (data) => {
-    socket.to(data.roomId).emit('get-look', { list: userList });
+    console.log(userList);
+    io.to(data.roomId).emit('get-looker', { list: userList });
   });
 });

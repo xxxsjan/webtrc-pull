@@ -8,6 +8,7 @@
       <video ref="localVideoRef" autoPlay playsInline id="localVideoRef"></video>
       local
     </div>
+    <div>{{ lookerList }}</div>
   </div>
 </template>
 
@@ -22,7 +23,7 @@ let socket: Socket | undefined = undefined;
 
 const socketId = ref('');
 const role = ref('');
-
+const lookerList = ref([]);
 function onClickAudience() {
   role.value = 'audience';
   socket?.emit('enter-live', {
@@ -31,7 +32,7 @@ function onClickAudience() {
   });
 }
 
-function sendCandidate(msg) {
+function sendCandidate(msg: any) {
   console.log('sendCandidate: ');
   socket?.emit('live-candidate', msg);
 }
@@ -113,6 +114,7 @@ function initSocket() {
     await pc.setLocalDescription(offer);
     // 发送给B
     socket.emit('live-offer', { offer, origin: socketId.value, id: offerId });
+    socket.emit('get-looker', { roomId: '123' });
   });
   socket.on('offer', async (data) => {
     // B收到offer，建立A通道
@@ -135,6 +137,10 @@ function initSocket() {
     console.log('candidate: ', data);
     const pc = getPc(data.origin);
     pc.addIceCandidate(data.candidate);
+  });
+  socket.on('get-looker', (res) => {
+    console.log('res:11111111111111111111111111111111111111111111111 ', res);
+    lookerList.value = res.list;
   });
   return socket;
 }
