@@ -31,8 +31,6 @@ function video2Canvas(dom: HTMLVideoElement) {
   const { width, height } = canvasRef.value;
 
   ctx.drawImage(dom, 0, 0, width, height);
-  const stream = canvasRef.value.captureStream(30); // 30 fps
-  // console.log(stream);
 }
 // canvas 2 stream 2 videoObj
 function canvas2Stream2VideoObj(canvas) {

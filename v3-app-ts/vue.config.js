@@ -4,6 +4,8 @@ const path = require('path');
 const AutoImport = require('unplugin-auto-import/webpack');
 const Components = require('unplugin-vue-components/webpack');
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+
 module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
@@ -23,6 +25,10 @@ module.exports = defineConfig({
       Components({
         resolvers: [ElementPlusResolver()],
       }),
+      new NodePolyfillPlugin(),
     ],
   },
+  // chainWebpack(config) {
+  //   config.resolve.fallback = { util: require.resolve('util/') };
+  // },
 });
