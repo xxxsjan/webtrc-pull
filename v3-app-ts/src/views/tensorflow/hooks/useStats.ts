@@ -1,4 +1,4 @@
-import Stats from './Stats';
+import Stats from '@/lib/Stats';
 class getStats {
   numInferences = 0;
   inferenceTimeSum = 0;

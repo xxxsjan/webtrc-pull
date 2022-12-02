@@ -1,5 +1,5 @@
 <template>
-  <div class="video-meeting">
+  <div class="WebRTC">
     <div style="margin-top: 20px">
       <p>我的画面 （{{ mineSocketId }}）</p>
       <video ref="localVideoRef" autoPlay playsInline id="localVideoRef"></video>
@@ -27,7 +27,7 @@ const { mineSocketId, userList, isJoin, emitJoin } = VideoMeeting(localVideoRef)
 </script>
 
 <style>
-.video-meeting {
+.WebRTC {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

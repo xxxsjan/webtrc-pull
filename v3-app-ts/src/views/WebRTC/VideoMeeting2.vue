@@ -1,5 +1,5 @@
 <template>
-  <div class="video-meeting">
+  <div class="WebRTC">
     <div style="margin-top: 20px">
       <div>VideoMeeting2</div>
       <p>我的画面 -- {{ socketId }}</p>
