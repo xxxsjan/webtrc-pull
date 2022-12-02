@@ -8,7 +8,7 @@
 <script lang="ts" setup>
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import '@tensorflow/tfjs-backend-webgl';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 onMounted(() => {
   init();
@@ -21,7 +21,7 @@ let detector: PoseDetector;
 let model = poseDetection.SupportedModels.PoseNet;
 const width = 640,
   height = 480;
-
+let afId;
 // 初始化
 const init = async () => {
   canvasRef = document.getElementById('output') as HTMLCanvasElement;
@@ -88,10 +88,7 @@ const detectPose = async () => {
     }
   });
 
-  requestAnimationFrame(() => detectPose());
-  // setTimeout(() => {
-  //   detectPose();
-  // }, 1000 / 60);
+  afId = requestAnimationFrame(() => detectPose());
 };
 
 // 画点
@@ -117,6 +114,12 @@ function drawSegment(
   ctx.strokeStyle = color;
   ctx.stroke();
 }
+
+onUnmounted(() => {
+  detector.dispose();
+  detector = null;
+  cancelAnimationFrame(afId);
+});
 </script>
 
 <style scoped></style>

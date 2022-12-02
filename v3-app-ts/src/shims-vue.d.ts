@@ -5,4 +5,8 @@ declare module '*.vue' {
   export default component;
 }
 
+interface Window {
+  Stats: any;
+}
 // declare module '@tensorflow/tfjs';
+declare module '*/Stats'

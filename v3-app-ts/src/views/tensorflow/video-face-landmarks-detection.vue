@@ -1,36 +1,38 @@
 <template>
   <div>
+    <div id="stats"></div>
     <canvas id="canvas" :width="width" :height="height"></canvas>
-    <video id="video" playsinline autoplay :width="width" :height="height" v-show="1"></video>
+    <video id="video" playsinline autoplay :width="width" :height="height" v-show="0"></video>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
 import * as faceMesh from '@mediapipe/face_mesh';
 let videoRef, canvasRef, canvasCtx;
-
+let detector;
+let afId;
+let stats;
 const width = 640,
   height = 480;
+import getStats from './hooks/useStats';
+
 async function drawFace() {
-  const _detector = await faceLandmarksDetection.createDetector(
-    faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh,
-    {
-      runtime: 'mediapipe',
-      refineLandmarks: true,
-      maxFaces: 1,
-      solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@${faceMesh.VERSION}`,
-    }
-  );
-  async function drawCanvas() {
-    const faces = await _detector.estimateFaces(videoRef, { flipHorizontal: false });
-    console.log('faces: ', faces);
-    canvasCtx.drawImage(videoRef, 0, 0, canvasRef.width, canvasRef.height);
-    drawResults(canvasCtx, faces);
+  if (videoRef.readyState < 2) {
+    await new Promise((resolve) => {
+      videoRef.onloadeddata = () => {
+        resolve(videoRef);
+      };
+    });
   }
-  requestAnimationFrame(() => drawCanvas());
+  stats.begin();
+  const faces = await detector.estimateFaces(videoRef, { flipHorizontal: false });
+  stats.end();
+  canvasCtx.drawImage(videoRef, 0, 0, canvasRef.width, canvasRef.height);
+  drawResults(canvasCtx, faces);
+  afId = requestAnimationFrame(() => drawFace());
 }
 
 function distance(a, b) {
@@ -271,10 +273,23 @@ async function init() {
     video: true,
   });
   videoRef.srcObject = stream;
+  stats = new getStats('stats');
+  detector = await faceLandmarksDetection.createDetector(faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh, {
+    runtime: 'mediapipe',
+    refineLandmarks: true,
+    maxFaces: 1,
+    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@${faceMesh.VERSION}`,
+  });
   drawFace();
 }
 onMounted(() => {
   init();
+});
+
+onUnmounted(() => {
+  detector.dispose();
+  detector = null;
+  cancelAnimationFrame(afId);
 });
 </script>
 

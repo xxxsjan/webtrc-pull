@@ -14,6 +14,7 @@
  * limitations under the License.
  * =============================================================================
  */
+import Stats from '../hooks/Stats';
 
 export function setupStats() {
   const stats = new Stats();
