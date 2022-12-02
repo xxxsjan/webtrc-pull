@@ -18,11 +18,16 @@ import * as posedetection from '@tensorflow-models/pose-detection';
 import * as scatter from 'scatter-gl';
 
 import * as params from './params';
-import {isMobile} from './util';
+import { isMobile } from './util';
 
 // These anchor points allow the pose pointcloud to resize according to its
 // position in the input.
-const ANCHOR_POINTS = [[0, 0, 0], [0, 1, 0], [-1, 0, 0], [-1, -1, 0]];
+const ANCHOR_POINTS = [
+  [0, 0, 0],
+  [0, 1, 0],
+  [-1, 0, 0],
+  [-1, -1, 0],
+];
 
 // #ffffff - White
 // #800000 - Maroon
@@ -45,9 +50,26 @@ const ANCHOR_POINTS = [[0, 0, 0], [0, 1, 0], [-1, 0, 0], [-1, -1, 0]];
 // #3cb44b - Chateau Green
 // #a9a9a9 - Silver Chalice
 const COLOR_PALETTE = [
-  '#ffffff', '#800000', '#469990', '#e6194b', '#42d4f4', '#fabed4', '#aaffc3',
-  '#9a6324', '#000075', '#f58231', '#4363d8', '#ffd8b1', '#dcbeff', '#808000',
-  '#ffe119', '#911eb4', '#bfef45', '#f032e6', '#3cb44b', '#a9a9a9'
+  '#ffffff',
+  '#800000',
+  '#469990',
+  '#e6194b',
+  '#42d4f4',
+  '#fabed4',
+  '#aaffc3',
+  '#9a6324',
+  '#000075',
+  '#f58231',
+  '#4363d8',
+  '#ffd8b1',
+  '#dcbeff',
+  '#808000',
+  '#ffe119',
+  '#911eb4',
+  '#bfef45',
+  '#f032e6',
+  '#3cb44b',
+  '#a9a9a9',
 ];
 export class Camera {
   constructor() {
@@ -56,9 +78,9 @@ export class Camera {
     this.ctx = this.canvas.getContext('2d');
     this.scatterGLEl = document.querySelector('#scatter-gl-container');
     this.scatterGL = new scatter.ScatterGL(this.scatterGLEl, {
-      'rotateOnStart': true,
-      'selectEnabled': false,
-      'styles': {polyline: {defaultOpacity: 1, deselectedOpacity: 1}}
+      rotateOnStart: true,
+      selectEnabled: false,
+      styles: { polyline: { defaultOpacity: 1, deselectedOpacity: 1 } },
     });
     this.scatterGLHasInitialized = false;
   }
@@ -69,25 +91,23 @@ export class Camera {
    */
   static async setupCamera(cameraParam) {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error(
-          'Browser API navigator.mediaDevices.getUserMedia not available');
+      throw new Error('Browser API navigator.mediaDevices.getUserMedia not available');
     }
 
-    const {targetFPS, sizeOption} = cameraParam;
+    const { targetFPS, sizeOption } = cameraParam;
     const $size = params.VIDEO_SIZE[sizeOption];
     const videoConfig = {
-      'audio': false,
-      'video': {
+      audio: false,
+      video: {
         facingMode: 'user',
         // Only setting the video to a specified size for large screen, on
         // mobile devices accept the default size.
         width: isMobile() ? params.VIDEO_SIZE['360 X 270'].width : $size.width,
-        height: isMobile() ? params.VIDEO_SIZE['360 X 270'].height :
-                             $size.height,
+        height: isMobile() ? params.VIDEO_SIZE['360 X 270'].height : $size.height,
         frameRate: {
           ideal: targetFPS,
-        }
-      }
+        },
+      },
     };
 
     const stream = await navigator.mediaDevices.getUserMedia(videoConfig);
@@ -118,19 +138,16 @@ export class Camera {
     camera.ctx.translate(camera.video.videoWidth, 0);
     camera.ctx.scale(-1, 1);
 
-    camera.scatterGLEl.style =
-        `width: ${videoWidth}px; height: ${videoHeight}px;`;
+    camera.scatterGLEl.style = `width: ${videoWidth}px; height: ${videoHeight}px;`;
     camera.scatterGL.resize();
 
-    camera.scatterGLEl.style.display =
-        params.STATE.modelConfig.render3D ? 'inline-block' : 'none';
+    camera.scatterGLEl.style.display = params.STATE.modelConfig.render3D ? 'inline-block' : 'none';
 
     return camera;
   }
 
   drawCtx() {
-    this.ctx.drawImage(
-        this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
+    this.ctx.drawImage(this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
   }
 
   clearCtx() {
@@ -166,8 +183,7 @@ export class Camera {
    * @param keypoints A list of keypoints.
    */
   drawKeypoints(keypoints) {
-    const keypointInd =
-        posedetection.util.getKeypointIndexBySide(params.STATE.model);
+    const keypointInd = posedetection.util.getKeypointIndexBySide(params.STATE.model);
     this.ctx.fillStyle = 'Red';
     this.ctx.strokeStyle = 'White';
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
@@ -206,16 +222,12 @@ export class Camera {
    */
   drawSkeleton(keypoints, poseId) {
     // Each poseId is mapped to a color in the color palette.
-    const color = params.STATE.modelConfig.enableTracking && poseId != null ?
-        COLOR_PALETTE[poseId % 20] :
-        'White';
+    const color = params.STATE.modelConfig.enableTracking && poseId != null ? COLOR_PALETTE[poseId % 20] : 'White';
     this.ctx.fillStyle = color;
     this.ctx.strokeStyle = color;
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
 
-    posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([
-                                                                      i, j
-                                                                    ]) => {
+    posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([i, j]) => {
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
 
@@ -235,14 +247,11 @@ export class Camera {
 
   drawKeypoints3D(keypoints) {
     const scoreThreshold = params.STATE.modelConfig.scoreThreshold || 0;
-    const pointsData =
-        keypoints.map(keypoint => ([-keypoint.x, -keypoint.y, -keypoint.z]));
+    const pointsData = keypoints.map((keypoint) => [-keypoint.x, -keypoint.y, -keypoint.z]);
 
-    const dataset =
-        new scatter.ScatterGL.Dataset([...pointsData, ...ANCHOR_POINTS]);
+    const dataset = new scatter.ScatterGL.Dataset([...pointsData, ...ANCHOR_POINTS]);
 
-    const keypointInd =
-        posedetection.util.getKeypointIndexBySide(params.STATE.model);
+    const keypointInd = posedetection.util.getKeypointIndexBySide(params.STATE.model);
     this.scatterGL.setPointColorer((i) => {
       if (keypoints[i] == null || keypoints[i].score < scoreThreshold) {
         // hide anchor points and low-confident points.
@@ -265,7 +274,7 @@ export class Camera {
       this.scatterGL.updateDataset(dataset);
     }
     const connections = posedetection.util.getAdjacentPairs(params.STATE.model);
-    const sequences = connections.map(pair => ({indices: pair}));
+    const sequences = connections.map((pair) => ({ indices: pair }));
     this.scatterGL.setSequences(sequences);
     this.scatterGLHasInitialized = true;
   }

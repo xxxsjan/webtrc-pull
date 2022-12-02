@@ -8,19 +8,24 @@ import { RouteRecordRaw } from 'vue-router';
 //   deep: 1,
 //   ignore: ['*.md'],
 // });
-const _routes: RouteRecordRaw[] = [];
-const files: any = require.context('../views', false, /\.vue$/);
-files.keys().map((key: string) => {
-  const content = files(key).default;
-  if (key.match(/^.\/(.*?).vue$/)) {
-    const name = key.match(/^.\/(.*?).vue$/)?.[1];
-    _routes.push({
-      path: '/' + name,
-      name,
-      component: content,
-    });
-  }
+export const modules: any = [];
+const modulesFiles = require.context('./modules', false, /\.ts$/);
+modulesFiles.keys().map((key) => {
+  const content = modulesFiles(key).default;
+  modules.push(content);
 });
+
+function flatRoutes(list: any) {
+  return list.reduce((pre: any, cur: any) => {
+    if (cur.children && cur.children.length > 0) {
+      pre.push(...cur.children);
+    } else {
+      pre.push(cur);
+    }
+    return pre;
+  }, []);
+}
+flatRoutes(modules);
 
 const routes: RouteRecordRaw[] = [
   {
@@ -28,20 +33,10 @@ const routes: RouteRecordRaw[] = [
     name: 'home',
     component: Layout,
     redirect: '/VideoMeeting',
-    children: [
-      {
-        path: '/VideoMeeting',
-        name: 'VideoMeeting',
-        component: VideoMeeting,
-      },
-      ..._routes,
-      {
-        path: '/live-video',
-        name: 'live-video',
-        component: () => import('@/views/live-video/index.vue'),
-      },
-    ],
+    children: [...flatRoutes(modules)],
   },
 ];
 
 export default routes;
+
+export const menuList = [ ...modules];

@@ -5,4 +5,4 @@ declare module '*.vue' {
   export default component;
 }
 
-declare module '@tensorflow/tfjs';
+// declare module '@tensorflow/tfjs';

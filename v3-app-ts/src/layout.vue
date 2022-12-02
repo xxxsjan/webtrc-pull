@@ -9,21 +9,32 @@
       active-text-color="#ffd04b"
       router
     >
-      <el-menu-item :index="item.path" v-for="item in list" :key="item.name">{{
-        item?.meta?.title || item.name
-      }}</el-menu-item>
+      <template v-for="item in list">
+        <template v-if="item.children">
+          <el-sub-menu :index="item.name" :key="item.name">
+            <template #title>{{ item.name }}</template>
+            <el-menu-item :index="sub.path" v-for="sub in item.children" :key="sub.name">{{
+              sub?.meta?.title || sub.name
+            }}</el-menu-item>
+          </el-sub-menu>
+        </template>
+        <template v-else>
+          <el-menu-item :index="item.path" :key="item.name">{{ item?.meta?.title || item.name }}</el-menu-item>
+        </template>
+      </template>
     </el-menu>
     <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts" setup>
-import routes from '@/router/routes';
+import { menuList } from '@/router/routes';
+
 import { ref, computed } from 'vue';
 
 const activeIndex2 = ref('/live-video');
-
-const list = ref(routes[0].children);
+console.log('menuList: ', menuList);
+const list = ref(menuList);
 </script>
 
 <style scoped></style>

@@ -1,5 +1,7 @@
 <template>
   <div id="stats"></div>
+  <el-button @click="closeStats">关闭stats</el-button>
+
   <div id="main">
     <div class="container">
       <div class="canvas-wrapper">
@@ -7,7 +9,7 @@
         <video
           id="video"
           playsinline
-          style="-webkit-transform: scaleX(-1); transform: scaleX(-1); visibility: hidden; width: auto; height: auto"
+          style="transform: scaleX(-1); visibility: visible; width: auto; height: auto"
         ></video>
       </div>
       <div id="scatter-gl-container"></div>
@@ -16,33 +18,44 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+// https://github.com/tensorflow/tfjs-models/tree/master/pose-detection/demos/live_video
+import { onMounted, onUnmounted } from 'vue';
 import '@tensorflow/tfjs-backend-webgl';
 // import '@tensorflow/tfjs-backend-webgpu';
 import * as mpPose from '@mediapipe/pose';
 
 // import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
-
 // tfjsWasm.setWasmPaths(`https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`);
 
 import * as posedetection from '@tensorflow-models/pose-detection';
-
 import { Camera } from './camera';
 import { setupDatGui } from './option_panel';
 import { STATE } from './params';
 import { setupStats } from './stats_panel';
 import { setBackendAndEnvFlags } from './util';
 
-let detector, camera, stats;
+let detector, camera, stats, gui;
 let startInferenceTime,
   numInferences = 0;
 let inferenceTimeSum = 0,
   lastPanelUpdate = 0;
 let rafId;
-
+function closeStats() {}
+onUnmounted(() => {
+  gui.destroy();
+  detector.dispose();
+  detector = null;
+});
 async function createDetector() {
   switch (STATE.model) {
     case posedetection.SupportedModels.PoseNet:
+      console.log(STATE.model, {
+        quantBytes: 4,
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        inputResolution: { width: 500, height: 500 },
+        multiplier: 0.75,
+      });
       return posedetection.createDetector(STATE.model, {
         quantBytes: 4,
         architecture: 'MobileNetV1',
@@ -122,6 +135,7 @@ function beginEstimatePosesStats() {
 function endEstimatePosesStats() {
   const endInferenceTime = (performance || Date).now();
   inferenceTimeSum += endInferenceTime - startInferenceTime;
+
   ++numInferences;
 
   const panelUpdateMilliseconds = 1000;
@@ -189,18 +203,22 @@ async function renderPrediction() {
 
 async function app() {
   const urlParams = new URLSearchParams('?model=posenet');
-  if (!urlParams.has('model')) {
-    alert('Cannot find model in the query string.');
-    return;
-  }
+  // if (!urlParams.has('model')) {
+  //   alert('Cannot find model in the query string.');
+  //   return;
+  // }
+  
+  console.log('STATE: ', STATE);
+  gui = await setupDatGui(urlParams);
+  console.log('STATE: ', STATE);
 
-  await setupDatGui(urlParams);
 
-  stats = setupStats();
+  !stats && (stats = setupStats());
 
   camera = await Camera.setupCamera(STATE.camera);
 
   await setBackendAndEnvFlags(STATE.flags, STATE.backend);
+  console.log('STATE: ', STATE);
 
   detector = await createDetector();
 
