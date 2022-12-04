@@ -31,4 +31,15 @@ module.exports = defineConfig({
   // chainWebpack(config) {
   //   config.resolve.fallback = { util: require.resolve('util/') };
   // },
+  chainWebpack: (config) => {
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap((options) => {
+        return {
+          ...options,
+          reactivityTransform: true,
+        };
+      });
+  },
 });

@@ -1,11 +1,13 @@
 <template>
   <div>
-    <canvas id="output" :width="width" :height="height"></canvas>
-    <video id="video" playsinline autoplay :width="width" :height="height" v-show="false"></video>
+    <canvas id="output"></canvas>
+    <video id="video" playsinline autoplay width="360" height="270" v-show="1"></video>
+    <!-- <video id="video" autoplay playsinline muted class="w-[360px] h-[270px] object-fill"></video> -->
   </div>
 </template>
 
 <script lang="ts" setup>
+// import { PoseDetector } from '@tensorflow-models/pose-detection';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import '@tensorflow/tfjs-backend-webgl';
 import { ref, onMounted, onUnmounted } from 'vue';
@@ -14,43 +16,52 @@ onMounted(() => {
   init();
 });
 // 其他地方要用到的公共变量
-let videoRef: HTMLVideoElement | HTMLImageElement | HTMLCanvasElement;
-let canvasRef: HTMLCanvasElement;
+let videoEl: HTMLVideoElement;
+let canvasEl: HTMLCanvasElement;
 let canvasCtx: CanvasRenderingContext2D;
 let detector: PoseDetector;
 let model = poseDetection.SupportedModels.PoseNet;
-const width = 640,
-  height = 480;
-let afId;
+
+let afId: any;
 // 初始化
 const init = async () => {
-  canvasRef = document.getElementById('output') as HTMLCanvasElement;
-  canvasCtx = canvasRef.getContext('2d')!;
+  canvasEl = document.getElementById('output') as HTMLCanvasElement;
+  canvasCtx = canvasEl.getContext('2d')!;
 
-  videoRef = document.getElementById('video') as HTMLVideoElement;
+  videoEl = document.getElementById('video') as HTMLVideoElement;
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: true,
   });
-  videoRef.srcObject = stream;
+  videoEl.srcObject = stream;
 
-  // 加载模型
-  detector = await poseDetection.createDetector(model, {
-    // modelType: 'full',
-    quantBytes: 4,
-    architecture: 'MobileNetV1',
-    outputStride: 16,
-    inputResolution: { width: width, height: height },
-    multiplier: 0.75,
-  });
-  // 开始检测
-  detectPose();
+  videoEl.onloadeddata = async function () {
+    console.log('onloadeddata: ');
+
+    const { width, height } = videoEl.getBoundingClientRect();
+    console.log('width, height: ', width, height);
+    canvasEl.width = width;
+    canvasEl.height = height;
+    // 加载模型
+    detector = await poseDetection.createDetector(model, {
+      modelType: 'full',
+      // quantBytes: 4,
+      // architecture: 'MobileNetV1',
+      // outputStride: 16,
+      // inputResolution: { width, height },
+      // multiplier: 0.75,
+    });
+    // 开始检测
+    detectPose();
+  };
 };
 
 // 开始检测
 const detectPose = async () => {
+  const video = document.getElementById('video') as HTMLVideoElement;
+
   // 获取检测结果
-  const poses = await detector.estimatePoses(videoRef, {
+  const poses = await detector.estimatePoses(canvasEl, {
     flipHorizontal: false, // 是否水平翻转
     maxPoses: 1, // 最大检测人数
     // scoreThreshold: 0.5, // 置信度
@@ -61,7 +72,7 @@ const detectPose = async () => {
   // console.log('🚀🚀🚀 / pointList', pointList[0]);
 
   // 绘制视频
-  canvasCtx.drawImage(videoRef, 0, 0, canvasRef.width, canvasRef.height);
+  canvasCtx.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);
 
   // 将这 17 个关键点的坐标信息 画到 canvas 上
 
