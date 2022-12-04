@@ -41,12 +41,12 @@ const io = new Server(https, {
 const userList = [];
 io.on('connection', (socket) => {
   console.log('connection~', socket.id, JSON.stringify(socket.handshake.query));
-  console.log(socket.id, socket.rooms);
-  socket.on('join', () => {
-    console.log(socket.id, 'join in');
-    socket.join('demo'); // 大厅聊天
-    socket.emit('new', socket.id); // 通知自己
-    socket.to('demo').emit('new', socket.id); // 通知别人
+  // console.log(socket.id, socket.rooms);
+  socket.on('join', (roomId) => {
+    console.log(socket.id, 'join in', roomId);
+    socket.join(roomId); // 大厅聊天
+    socket.emit('new', socket.id, roomId); // 通知自己
+    socket.to(roomId).emit('new', socket.id); // 通知别人
   });
 
   // 用户离开房间
@@ -55,18 +55,18 @@ io.on('connection', (socket) => {
   });
   //消息中转
   socket.on('message', (message) => {
-    console.log('message', 'socket.id', socket.id, 'target:' + message.target, 'data-type:' + message.data.type);
+    console.log('--message', '--socket.id', socket.id, '--target:' + message.target, '--data-type:' + message.data.type);
     if (message.target) {
       socket.to(message.target).emit('message', {
         originId: socket.id,
         data: message.data,
       });
     } else {
-      console.log('!target');
-      socket.broadcast.to('demo').emit('message', {
-        originId: socket.id,
-        data: message.data,
-      });
+      // console.log('!target');
+      // socket.broadcast.to('demo').emit('message', {
+      //   originId: socket.id,
+      //   data: message.data,
+      // });
     }
   });
 

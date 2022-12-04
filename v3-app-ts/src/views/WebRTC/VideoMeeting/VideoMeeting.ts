@@ -26,7 +26,7 @@ export default function VideoMeeting(localVideoRef: Ref<HTMLVideoElement> /** �
 
   //发送消息到指定对等方
   const sendMessage = (data: any, target?: string | null) => {
-    console.log('sendMessage', target, data);
+    console.log('sendMessage', data, target);
     socket.value?.emit('message', {
       target,
       data,
@@ -106,10 +106,11 @@ export default function VideoMeeting(localVideoRef: Ref<HTMLVideoElement> /** �
     });
 
     // 当收到新用户加入房间时，主动发起WebRTC连接  newId --> socketId,每个socket一个
-    socket.value.on('new', (newId) => {
+    socket.value.on('new', (newId, roomId) => {
       console.log('new', newId, mineSocketId.value);
       if (newId === mineSocketId.value) {
-        alert('加入大厅成功');
+        console.log('加入大厅成功', roomId);
+        console.log('roomId: ', roomId);
         isJoin.value = true;
       } else {
         const connection = getConnection(newId);
@@ -157,8 +158,9 @@ export default function VideoMeeting(localVideoRef: Ref<HTMLVideoElement> /** �
     socket.value?.emit('leave', mineSocketId.value);
   });
 
-  function emitJoin() {
-    socket.value?.emit('join');
+  function emitJoin(roomId: string) {
+    if (!roomId) return;
+    socket.value?.emit('join', roomId);
   }
 
   return {

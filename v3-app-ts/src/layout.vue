@@ -32,7 +32,7 @@ import { menuList } from '@/router/routes';
 
 import { ref, computed } from 'vue';
 
-const activeIndex2 = ref('/live-video');
+const activeIndex2 = ref('/VideoMeeting');
 console.log('menuList: ', menuList);
 const list = ref(menuList);
 </script>

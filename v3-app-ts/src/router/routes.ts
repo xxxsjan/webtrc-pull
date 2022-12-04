@@ -35,8 +35,13 @@ const routes: RouteRecordRaw[] = [
     redirect: '/VideoMeeting',
     children: [...flatRoutes(modules)],
   },
+  {
+    path: '/:pathMatch(.*)',
+    name: 'NotFound',
+    component: () => import('@/views/404.vue'),
+  },
 ];
 
 export default routes;
 
-export const menuList = [ ...modules];
+export const menuList = [...modules];
