@@ -12,6 +12,11 @@ const tensorflowRoutes = {
       component: () => import('@/views/tensorflow/video-pose-detection.vue'),
     },
     {
+      path: '/video-pose-detection2',
+      name: 'video-pose-detection2',
+      component: () => import('@/views/tensorflow/video-pose-detection2.vue'),
+    },
+    {
       path: '/video-remove-back',
       name: 'video-remove-back',
       component: () => import('@/views/tensorflow/video-remove-back.vue'),

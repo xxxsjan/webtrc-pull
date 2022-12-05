@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts" setup>
-// import { PoseDetector } from '@tensorflow-models/pose-detection';
+import { PoseDetector } from '@tensorflow-models/pose-detection';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import '@tensorflow/tfjs-backend-webgl';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 
 onMounted(() => {
   init();
@@ -60,7 +60,7 @@ const init = async () => {
 const detectPose = async () => {
   const video = document.getElementById('video') as HTMLVideoElement;
 
-  // 获取检测结果
+  // 检测画布动作
   const poses = await detector.estimatePoses(canvasEl, {
     flipHorizontal: false, // 是否水平翻转
     maxPoses: 1, // 最大检测人数
@@ -69,7 +69,6 @@ const detectPose = async () => {
   });
   // 将 pose 上的 17 个关键点的坐标信息存入 pointList
   const pointList = poses[0]?.keypoints || [];
-  // console.log('🚀🚀🚀 / pointList', pointList[0]);
 
   // 绘制视频
   canvasCtx.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);

@@ -41,11 +41,13 @@ let inferenceTimeSum = 0,
   lastPanelUpdate = 0;
 let rafId;
 function closeStats() {}
+
 onUnmounted(() => {
   gui.destroy();
   detector.dispose();
   detector = null;
 });
+
 async function createDetector() {
   switch (STATE.model) {
     case posedetection.SupportedModels.PoseNet:

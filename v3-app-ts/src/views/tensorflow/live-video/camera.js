@@ -18,6 +18,7 @@ import * as posedetection from '@tensorflow-models/pose-detection';
 import * as scatter from 'scatter-gl';
 
 import * as params from './params';
+
 import { isMobile } from './util';
 
 // These anchor points allow the pose pointcloud to resize according to its
@@ -28,7 +29,6 @@ const ANCHOR_POINTS = [
   [-1, 0, 0],
   [-1, -1, 0],
 ];
-
 // #ffffff - White
 // #800000 - Maroon
 // #469990 - Malachite
@@ -169,6 +169,7 @@ export class Camera {
    * @param pose A pose with keypoints to render.
    */
   drawResult(pose) {
+    console.log('pose: ', pose.id);
     if (pose.keypoints != null) {
       this.drawKeypoints(pose.keypoints);
       this.drawSkeleton(pose.keypoints, pose.id);
@@ -184,10 +185,10 @@ export class Camera {
    */
   drawKeypoints(keypoints) {
     const keypointInd = posedetection.util.getKeypointIndexBySide(params.STATE.model);
-    this.ctx.fillStyle = 'Red';
     this.ctx.strokeStyle = 'White';
-    this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
+    this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH; 
 
+    this.ctx.fillStyle = 'Red';
     for (const i of keypointInd.middle) {
       this.drawKeypoint(keypoints[i]);
     }
@@ -207,6 +208,7 @@ export class Camera {
     // If score is null, just show the keypoint.
     const score = keypoint.score != null ? keypoint.score : 1;
     const scoreThreshold = params.STATE.modelConfig.scoreThreshold || 0;
+    // console.log('score: ', score, scoreThreshold);
 
     if (score >= scoreThreshold) {
       const circle = new Path2D();

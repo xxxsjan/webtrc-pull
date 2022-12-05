@@ -8,12 +8,6 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@mediapipe/pose": "^0.5.1635988162",
-    "@tensorflow-models/pose-detection": "^2.0.0",
-    "@tensorflow/tfjs": "^4.1.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.1.0",
-    "@tensorflow/tfjs-converter": "^4.1.0",
-    "@tensorflow/tfjs-core": "^4.1.0",
     "core-js": "^3.8.3",
     "dat.gui": "^0.7.9",
     "element-plus": "^2.2.25",
@@ -26,7 +20,13 @@
   },
   "devDependencies": {
     "@mediapipe/face_mesh": "^0.4.1633559619",
+    "@mediapipe/pose": "^0.5.1635988162",
     "@tensorflow-models/face-landmarks-detection": "^1.0.2",
+    "@tensorflow-models/pose-detection": "^2.0.0",
+    "@tensorflow/tfjs": "^4.1.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.1.0",
+    "@tensorflow/tfjs-converter": "^4.1.0",
+    "@tensorflow/tfjs-core": "^4.1.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
