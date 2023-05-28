@@ -1,9 +1,11 @@
 <template>
   <div>
+    <el-select v-model="deviceId" class="m-2" placeholder="Select" size="large">
+      <el-option v-for="item in videoSelectOpts" :key="item.value" :label="item.label" :value="item.deviceId" />
+    </el-select>
     <canvas id="output"></canvas>
-    <video id="video" playsinline autoplay width="640" height="480" v-show="1"></video>
-    <!-- <video id="video" autoplay playsinline muted class="w-[360px] h-[270px] object-fill"></video> -->
-    <el-button @click="onStart">开始</el-button>
+    <!-- <video id="video" playsinline autoplay width="640" height="480" v-show="1"></video> -->
+    <video id="video" autoplay playsinline muted class="w-[360px] h-[270px] object-fill"></video>
   </div>
 </template>
 
@@ -11,7 +13,7 @@
 import { PoseDetector } from '@tensorflow-models/pose-detection';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import '@tensorflow/tfjs-backend-webgl';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 let videoEl: HTMLVideoElement;
 let canvasEl: HTMLCanvasElement;
@@ -24,7 +26,6 @@ const DEFAULT_RADIUS = 4;
 const SCORE_THRESHOLD = 0.5;
 
 let requestID: any; // requestAnimationFrame
-function onStart() {}
 // 初始化
 const init = async () => {
   canvasEl = document.getElementById('output') as HTMLCanvasElement;
@@ -130,8 +131,42 @@ function drawSkeleton(ctx: CanvasRenderingContext2D, keypoints: any, poseId?: an
     }
   });
 }
+const videoSelectOpts = ref([]);
+const deviceId = ref('');
+// 获取所有音视频设备
+function getDevices() {
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then((devices) => {
+      console.log('devices: ', devices);
+      videoSelectOpts.value = devices.filter((device) => device.kind === 'videoinput');
+      //   = devices.filter((device) => device.kind === 'audioinput');
+      //   = devices.filter((device) => device.kind === 'audiooutput');
+    })
+    .catch();
+}
+// 切换视频输入设备
+async function handleVideoInputChange(deviceId: string) {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: { deviceId },
+  });
+  const video = document.querySelector('#video') as HTMLVideoElement;
+  video.srcObject = stream;
+  video.onloadedmetadata = () => {
+    video.play();
+  };
+}
+watch(
+  () => deviceId.value,
+  (v) => {
+    console.log(v);
+    handleVideoInputChange(v);
+  }
+);
 onMounted(() => {
   init();
+  getDevices();
 });
 onUnmounted(() => {
   detector.dispose();
